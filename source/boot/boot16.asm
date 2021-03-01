@@ -25,14 +25,20 @@ start :
     sti
 
     ; ==== Screen cleaning ====
-    mov ax, 3
+    mov ax, 0x0003
     int 0x10
 
+    ; ==== Set cursor position ====
+    mov ax, 0x0200
+    mov dx, 0x0000
+    xor bh, bh
+    int 10h
+
     ; ==== Print hello message ====
-    mov ax, 0x1301
+    mov ax, 0x1300
     mov bp, hello_message
-    mov cx, 19
-    mov bl, 0x02
+    mov cx, 0x0013
+    mov bl, 0x000F
     int 10h
 
     ; ==== Infinity loop ====
