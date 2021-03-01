@@ -38,7 +38,7 @@ start :
     mov ax, 0x1300
     mov bp, hello_message
     mov cx, 0x0013
-    mov bl, 0x000F
+    mov bl, 0x000D
     int 10h
 
     ; ==== Infinity loop ====
