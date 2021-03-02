@@ -20,19 +20,12 @@ start :
     ; Zero ss (Stack segment)
     mov ss, ax
     ; Set sp (Stack Pointer) as start point
-    mov sp, 0x7c00
+    mov sp, $$
     ; Enable interruption
     sti
 
-    ; ==== Screen cleaning ====
-    mov ax, 0x0003
-    int 0x10
-
-    ; ==== Set cursor position ====
-    mov ax, 0x0200
-    mov dx, 0x0000
-    xor bh, bh
-    int 10h
+    ; ==== Screen cleaning and set cursor position ====
+    call cls_16
 
     ; ==== Print hello message ====
     mov ax, 0x1300
@@ -43,6 +36,18 @@ start :
 
     ; ==== Infinity loop ====
     jmp $
+
+; ==== CLS_16 syscall ====
+cls_16 :
+    mov ax, 0x0003
+    int 0x10
+
+    mov ax, 0x0200
+    mov dx, 0x0000
+    xor bh, bh
+    int 10h
+
+    ret
 
 ; ==== Hello str ====
 hello_message db "Hello, bootloader!", 0
