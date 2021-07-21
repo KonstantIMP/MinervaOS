@@ -19,7 +19,7 @@ int main (int argc, char ** argv)
   printf ("MinervaOS boot...\n");
 
   if (argc != 2) {
-    fprintf (stderr, "Path to the kernel is not specified\n");
+    printf ("Path to the kernel is not specified\n");
     return -1;
   }
 
@@ -36,7 +36,7 @@ int main (int argc, char ** argv)
     /** Allocate memory for kernel */
     buff = malloc(size + 1);
     if (buff == NULL) {
-      fprintf(stderr, "Cannot allocate memory for the kernel");
+      printf ("Cannot allocate memory for the kernel");
       return -1;
     }
 
@@ -45,7 +45,7 @@ int main (int argc, char ** argv)
     fclose(kernel);
   }
   else {
-    fprintf(stderr, "Cannot open the kernel\n");
+    printf ("Cannot open the kernel\n");
     return -1;
   }
 
@@ -66,7 +66,7 @@ int main (int argc, char ** argv)
     ST->StdErr->Reset(ST->StdErr, 0);
 
     if (EFI_ERROR(status)) {
-      fprintf(stderr, "Cannot setup video mode\n");
+      printf ("Cannot setup video mode\n");
       return -1;
     }
 
@@ -80,9 +80,50 @@ int main (int argc, char ** argv)
     bootp.pitch = sizeof(unsigned int) * gop->Mode->Information->PixelsPerScanLine;
   }
   else {
-    fprintf(stderr, "Unable to get graphical protocols\n");
+    printf ("Unable to get graphical protocols\n");
     return -1;
   }
 
+  /** Check the Elf64 signature */
+  Elf64_Ehdr *elf = (Elf64_Ehdr *)buff;
+  
+  if (!memcmp(elf->e_ident, ELFMAG, SELFMAG) &&
+      elf->e_ident[EI_CLASS] == ELFCLASS64   &&
+      elf->e_ident[EI_DATA] == ELFDATA2LSB   &&
+      elf->e_type == ET_EXEC                 &&
+      elf->e_machine == EM_MACH              &&
+      elf->e_phnum > 0                      ) {
+    /** Load segments */
+    int i; Elf64_Phdr * phdr;
+    for (phdr = (Elf64_Phdr *)(buff + elf->e_phoff), i = 0; i < elf->e_phoff;
+              i++, phdr = (Elf64_Phdr *)((uint8_t *)phdr + elf->e_phentsize)) {
+      if(phdr->p_type == PT_LOAD) {
+        memcpy((void*)phdr->p_vaddr, buff + phdr->p_offset, phdr->p_filesz);
+        memset((void*)(phdr->p_vaddr + phdr->p_filesz), 0, phdr->p_memsz - phdr->p_filesz);
+      }
+    }
+  }
+  else {
+    printf("Incorrect ELF for this ARCH\n");
+    return -1;
+  }
+
+  /** Get entry point */
+  uintptr_t entry = elf->e_entry;
+
+  /** Free the memory */
+  free(kernel);
+
+  /** Exit UEFI session */
+  if (exit_bs()) {
+    printf("UEFI error. Cant stop the process\n");
+    return -1;
+  }
+
+  /** Call the entry point of the kernel */
+  (*((void(* __attribute__((sysv_abi)))(bootparam_t *))(entry)))(&bootp);
+
+  /** It should not exit */
+  while (1) {};
   return 0;
 }
