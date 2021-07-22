@@ -9,6 +9,7 @@ import build.cli, build.project, build.target;
 
 class Build {
     private static Project[string] loadedProjects;
+    private static Project[string] builtProject;
 
     public static void addProject (Project p) {
         loadedProjects[p.projectName] = p;
@@ -44,9 +45,12 @@ class Build {
     }
 
     public static void buildProject (Project p) {
-        Cli.message("Build project : ", p.projectName, "\n");
-        foreach (dep; p.deps) buildProject(dep);
-        foreach (target; p.targets) buildTarget(target);
+        if (p.projectName !in builtProject) {
+            Cli.message("Build project : ", p.projectName, "\n");
+            foreach (dep; p.deps) buildProject(dep);
+            foreach (target; p.targets) buildTarget(target);
+            builtProject[p.projectName] = p;
+        }
     }
 
     public static void buildLoaded () {
