@@ -5,7 +5,7 @@
  */
 module kernel.kmain;
 
-import stl.uda : KERNEL_API;
+import stl.uda : KERNEL_ABI;
 
 /** 
  * Struct for sending boot parametrs to the kernel
@@ -18,14 +18,14 @@ struct Bootparam {
 }
 
 /** Undefined but required symbol */
-@KERNEL_API extern (C) void* _Dmodule_ref;
+@KERNEL_ABI extern (C) void* _Dmodule_ref;
 
 /** 
  * Entry point for the kernel
  * Params:
  *   bootp = Input kernel`s params
  */
-@KERNEL_API
+@KERNEL_ABI
 extern (C) void kmain (Bootparam bootp) {
     
 }
