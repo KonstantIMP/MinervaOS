@@ -17,7 +17,8 @@ void initBootloader () {
 
 void initStl () {
     string [] stlSource = [
-        "source/stl/uda.d"
+        "source/stl/uda.d",
+        "source/stl/memory/address.d"
     ];
 
     string compile = "ldc2 -mtriple=x86_64-elf64 $in$ --gcc=clang --linker=lld --nogc --relocation-model=pic -c -nodefaultlib -code-model=large -lib -of=$out$";
