@@ -10,7 +10,7 @@ import stl.uda : KERNEL_ABI;
 /** 
  * Struct for sending boot parametrs to the kernel
  */
-struct Bootparam {
+extern (C) struct Bootparam {
     uint * framebuffer; /** Pointer to the sceen buffer*/
     uint   width;       /** Width of the screen */
     uint   height;      /** Height of the screen */
@@ -26,6 +26,10 @@ struct Bootparam {
  *   bootp = Input kernel`s params
  */
 @KERNEL_ABI
-extern (C) void kmain (Bootparam bootp) {
-    
+extern (C) void kmain (Bootparam * bootp) {
+    for (ulong i = 0; i < bootp.width * bootp.height; i++) {
+        bootp.framebuffer[i] = 0x000008;
+    }
+
+    while (true) {}
 }
