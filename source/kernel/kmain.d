@@ -5,6 +5,8 @@
  */
 module kernel.kmain;
 
+import stl.uda : KERNEL_API;
+
 /** 
  * Struct for sending boot parametrs to the kernel
  */
@@ -15,8 +17,15 @@ struct Bootparam {
     uint   pitch;       /** Number of pixels per scan line */
 }
 
-extern (C) void* _Dmodule_ref;
+/** Undefined but required symbol */
+@KERNEL_API extern (C) void* _Dmodule_ref;
 
+/** 
+ * Entry point for the kernel
+ * Params:
+ *   bootp = Input kernel`s params
+ */
+@KERNEL_API
 extern (C) void kmain (Bootparam bootp) {
     
 }
