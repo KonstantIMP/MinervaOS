@@ -5,6 +5,7 @@
  */
 module stl.uda;
 
-/** Mark kernels ABI */
+/** Mark kernels ABI, STL*/
 enum KERNEL_ABI;
+enum KERNEL_STL;
 
