@@ -16,7 +16,7 @@ class Target {
 
     private string makeCommand;
 
-    public this (string name, string [] src, Target [] dependencies, string make, bool phony = false) {
+    public this (string name, string [] src, Target [] dependencies, string make, bool phony = true) {
         targetName = name; sources = src; deps = dependencies; isPhony = phony;
         makeCommand = make;
     }
