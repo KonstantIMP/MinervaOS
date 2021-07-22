@@ -35,7 +35,7 @@ void initKernel () {
     ];
 
     string compile = "ldc2 -mtriple=x86_64-elf64 $in$ --gcc=clang --linker=lld --nogc --relocation-model=pic -c -nodefaultlib -code-model=large -Isource/ -of=kmain.o";
-    string link = "ld -nostdlib -b elf64-x86-64 -T source/linker.ld -o $out$ kmain.o stl.o";
+    string link = "ld -nostdlib -b elf64-x86-64 -z max-page-size=0x1000 -Ttext=0x01000000 -e kmain -o $out$ kmain.o stl.o";
 
     Target kernelBin = new Target ("kernel.bin", kernelSource, [], compile ~ " && " ~ link);
     Project minervaKernel = new Project ("MinervaKernel", new Version (0,0,0), [kernelBin], [Build.findDependency("MinervaBoot"), Build.findDependency("MinervaStl")]);
